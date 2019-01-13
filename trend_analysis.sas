@@ -436,5 +436,75 @@ proc surveylogistic data=tog_nmod; * logistic regression model for coronary angi
 
 run;
 
-proc contents data=tog_nmod;
+proc surveymeans data = tog_nmod;
+
+where renaltx = 1;
+cluster hospid;
+weight discwt;
+strata nis_stratum;
+
+domain year;
+
+var age;
+run;
+
+******************* trend analysis for years of study from 2007 - 2015 for renal tx cohort only ;
+
+
+proc surveyfreq data=tog_nmod; * # of admissions for renaltx cohort;
+
+cluster hospid;
+strata nis_stratum;
+weight discwt;
+
+table year * renaltx/row cl chisq;
+run;
+
+proc surveyfreq data=tog_nmod;
+
+cluster hospid;
+strata nis_stratum;
+weight discwt;
+
+where renaltx = 1;
+
+table year * cor_ang / row cl chisq;
+
+run;
+
+
+
+proc surveyreg data=tog_nmod;
+
+cluster hospid;
+strata nis_stratum;
+weight discwt;
+
+where renaltx = 1;
+class year;
+
+model age = year;
+run;
+
+proc surveyfreq data=tog_nmod;
+
+cluster hospid;
+strata nis_stratum;
+weight discwt;
+
+where renaltx = 1;
+
+table year * inter/ row chisq cl;
+
+run;
+
+proc surveyfreq data=tog_nmod;
+
+cluster hospid;
+strata nis_stratum;
+weight discwt;
+
+where renaltx = 1;
+
+table year * pci / row cl chisq;
 run;
