@@ -1,5 +1,5 @@
-libname kid "F:\kidtx_nstemi\data";
-libname kid2 "F:\kidtx_nstemi\";
+libname kid "G:\kidtx_nstemi\data";
+libname kid2 "G:\kidtx_nstemi\";
 
 * overall procedures done;
 data work.tog_nmod;
@@ -303,6 +303,7 @@ run;
 
 * predictors for intervention in patients with renatx;
 proc surveylogistic data=tog_nmod;
+
 	class  carotid(ref = "0") chf(ref = "0") cm_dm(ref = "0") cm_dmcx(ref = "0") cm_htn_c(ref = "0") cm_obese(ref = "0") cm_wghtloss(ref = "0") female(ref = "0")
 		priicd(ref = "0") priorcabg(ref = "0") priorpci(ref = "0") priorst(ref = "0") insu(ref = "1") inter race_n(ref = "1") / param=GLM;
 	model inter(event = "1") = age carotid chf cm_dm cm_dmcx cm_htn_c cm_obese cm_wghtloss female priicd priorcabg priorpci priorst insu race_n;
@@ -347,6 +348,7 @@ run;
 
 * logistic regression to determine predictors of mortality in patients who had prior renal tx;
 proc surveylogistic data=tog_nmod;
+
 	class  died  chf(ref = "0") cm_dm(ref = "0") cm_dmcx(ref = "0") cm_htn_c(ref = "0") cm_obese(ref = "0") cm_wghtloss(ref = "0") female(ref = "0")
 		priicd(ref = "0") priorcabg(ref = "0") priorpci(ref = "0") priorst(ref = "0") insu(ref = "1") inter(ref = "0") race_n(ref = "1") / param=GLM;
 	model died(event = "1") = age chf cm_dm cm_dmcx cm_htn_c cm_obese cm_wghtloss female priorcabg priorpci priorst  inter;
@@ -391,3 +393,48 @@ proc freq data=tog_nmod;
 	table hosp_bedsize hosp_locteach hosp_region;
 run;
 
+************ 01/13/2019 ******** further data analysis;
+* coronary angiogram = cangio + pci;
+
+data tog_nmod;
+set tog_nmod;
+cor_ang = 0;
+if pci = 1 or cangio = 1 then cor_ang = 1;
+run;
+* coronary angiogram and renaltx cohort;
+
+proc surveyfreq data=tog_nmod;
+
+cluster hospid;
+strata nis_stratum;
+weight discwt;
+
+table cor_ang/ row cl;
+run;
+
+* coronary angiogram according to renal tx;
+
+
+proc surveyfreq data=tog_nmod;
+
+cluster hospid;
+strata nis_stratum;
+weight discwt;
+
+table renaltx * cor_ang / row cl chisq or;
+run;
+
+proc surveylogistic data=tog_nmod; * logistic regression model for coronary angiogram according to renal tx;
+
+	class  carotid(ref = "0") chf(ref = "0") cm_dm(ref = "0") cm_dmcx(ref = "0") cm_htn_c(ref = "0") cm_obese(ref = "0") cm_wghtloss(ref = "0") female(ref = "0")
+		priicd(ref = "0") priorcabg(ref = "0") priorpci(ref = "0") priorst(ref = "0") insu(ref = "1") inter race_n(ref = "1") / param=GLM;
+
+	model cor_ang(event = "1") = age  renaltx carotid chf cm_dm cm_dmcx cm_htn_c cm_obese cm_wghtloss female priicd priorcabg priorpci priorst insu race_n;
+	cluster hospid;
+	strata nis_stratum;
+	weight discwt;
+
+run;
+
+proc contents data=tog_nmod;
+run;
