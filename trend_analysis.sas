@@ -498,7 +498,7 @@ table year * inter/ row chisq cl;
 
 run;
 
-proc surveyfreq data=tog_nmod;
+proc surveyfreq data=tog_nmod; * PCI by year in renaltx cohort;
 
 cluster hospid;
 strata nis_stratum;
@@ -508,3 +508,26 @@ where renaltx = 1;
 
 table year * pci / row cl chisq;
 run;
+
+proc surveyfreq data=tog_nmod; * CABG by year in renaltx cohort;
+
+cluster hospid;
+strata nis_stratum;
+weight discwt;
+
+where renaltx = 1;
+
+table year * cabg / row cl chisq;
+run;
+
+proc surveyfreq data=tog_nmod; * died  by year in renaltx cohort;
+
+cluster hospid;
+strata nis_stratum;
+weight discwt;
+
+where renaltx = 1;
+
+table year * died / row cl chisq;
+run;
+
