@@ -1,0 +1,55 @@
+---
+title: "kidtx_nstemi_graphs"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+loading libraries
+
+```{r}
+library(tidyverse);library(haven);library(mosaic);library(ggthemes)
+```
+
+getting dataframe
+
+```{r}
+d <- read_sas("G:/kidtx_nstemi/data/renalpci.sas7bdat")
+d$PCI <- d$dec
+```
+
+Create stacked bar chart:
+
+```{r}
+
+g1 <- ggplot(data = d, aes(x = factor(year), y = count,fill = PCI)) + geom_bar(stat = "identity", position = "fill") + theme_gdocs() + scale_fill_manual(values = c("lightgray","darkgray"))
+
+g2 <- g1 + ylab("Proportion of Patients")  + xlab("Year") 
+
+g2
+
+ggsave(g2,filename =  "G:/kidtx_nstemi/data/pci_graph.tiff")
+```
+
+getting dataframe:
+
+```{r}
+p <- read_sas("G:/kidtx_nstemi/data/renalcabg.sas7bdat")
+p$CABG <- d$dec
+```
+
+Create stacked bar chart:
+
+```{r}
+
+pg1 <- ggplot(data = p, aes(x = factor(year), y = count,fill = CABG)) + geom_bar(stat = "identity", position = "fill") + theme_gdocs() + scale_fill_manual(values = c("lightgray","darkgray"))
+
+pg2 <- pg1 + ylab("Proportion of Patients")  + xlab("Year") 
+
+pg2
+
+
+```
+
